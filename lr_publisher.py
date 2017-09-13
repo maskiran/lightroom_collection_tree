@@ -1,3 +1,4 @@
+import glob
 import os
 from pprint import pprint
 import re
@@ -167,6 +168,8 @@ def publish_images(collections, source, destination, name=None):
                 shutil.copy2(src_image, dst_image)
                 #os.symlink(src_image, dst_image)
         delete_extra_images(added_images, dst_collection_folder)
+        files = glob.glob(dst_collection_folder + "/*.jpg")
+        collections[cxn_id]['images_published'] = len(files)
 
 
 def delete_extra_folders(collections, destination):
@@ -209,6 +212,21 @@ def delete_extra_images(image_list, destination_folder):
             os.unlink(child)
 
 
+def print_summary(collections):
+    print "%40s %10s %10s" % ("Name", "Lightroom", "Folder")
+    print "-"*80
+    lr_count = 0
+    folder_count = 0
+    for cxn_id in sorted(collections, key=lambda x: collections[x]['name']):
+        print "%40s %10d %10d" % (collections[cxn_id]['name'].replace('My Collections/', ''),
+                collections[cxn_id]['count'],
+                collections[cxn_id]['images_published'])
+        lr_count += collections[cxn_id]['count']
+        folder_count += collections[cxn_id]['images_published']
+    print "-"*80
+    print "%40s %10d %10d" % ('Total', lr_count, folder_count)
+    print "-"*80
+
 if __name__ == "__main__":
     folders = get_folders()
     collections = get_collections()
@@ -218,3 +236,4 @@ if __name__ == "__main__":
     publish_images(collections, src, dst)
     delete_extra_folders(collections, dst)
     DB.close()
+    print_summary(collections)
