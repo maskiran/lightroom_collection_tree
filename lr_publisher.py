@@ -213,18 +213,27 @@ def delete_extra_images(image_list, destination_folder):
 
 
 def print_summary(collections):
-    print "%40s %10s %10s" % ("Name", "Lightroom", "Folder")
-    print "-"*80
     lr_count = 0
     folder_count = 0
+    idx = 0
+    name_max_size = 0
+    for cxn_id in collections:
+        cur_len = len(collections[cxn_id]['name'].replace('My Collections/', ''))
+        if cur_len > name_max_size:
+            name_max_size = cur_len
+    print "-"*80
+    print "%-*s %10s %6s" % (name_max_size, "Name", "Lightroom", "Folder")
+    print "-"*80
     for cxn_id in sorted(collections, key=lambda x: collections[x]['name']):
-        print "%40s %10d %10d" % (collections[cxn_id]['name'].replace('My Collections/', ''),
+        idx += 1
+        print "%-*s %10d %6d" % (name_max_size, collections[cxn_id]['name'].replace('My Collections/', ''),
                 collections[cxn_id]['count'],
                 collections[cxn_id]['images_published'])
         lr_count += collections[cxn_id]['count']
         folder_count += collections[cxn_id]['images_published']
+    total = "Total %d Collections" % idx
     print "-"*80
-    print "%40s %10d %10d" % ('Total', lr_count, folder_count)
+    print "%-*s %10d %6d" % (name_max_size, total, lr_count, folder_count)
     print "-"*80
 
 if __name__ == "__main__":
