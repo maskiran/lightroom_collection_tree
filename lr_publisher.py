@@ -181,6 +181,8 @@ def delete_extra_folders(collections, destination):
             dest_folders.append(os.path.join(path, fldr))
     col_folders = [];
     for cx in collections:
+        if collections[cx]['count'] == 0:
+            continue
         path = collections[cx]['name']
         col_folders.append(path)
         # add the top level folders into the col_folders as safe folder
