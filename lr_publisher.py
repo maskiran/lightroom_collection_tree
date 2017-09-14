@@ -110,22 +110,22 @@ def get_images_in_collection(collections, folders, collection_ids=None):
             # check if this image is in a stack, if so on position 1
             if not is_image_on_top_of_stack(collection_id, image_id):
                 continue
-            root_file_query = DB.execute('select rootFile from Adobe_images where id_local=?', (image_id,))
+            root_file_query = DB.execute('select rootFile from Adobe_images where id_local=? and colorLabels!="Red"', (image_id,))
             root_file_data = root_file_query.fetchone()
-            root_file_id = root_file_data['rootFile']
-            lib_file_query = DB.execute('select * from AgLibraryFile where id_local=?', (root_file_id,))
-            image_info = lib_file_query.fetchone()
-            folder_id = image_info['folder']
-            base_name = image_info['baseName']
-            image_path = folders[folder_id] + base_name
-            tmp_image_path = image_path
-            idx = 0
-            while tmp_image_path in collections[collection_id]['images']:
-                idx += 1
-                tmp_image_path = image_path + '-' + str(idx)
-            image_path = tmp_image_path
-
-            collections[collection_id]['images'].append(image_path)
+            if root_file_data:
+                root_file_id = root_file_data['rootFile']
+                lib_file_query = DB.execute('select * from AgLibraryFile where id_local=?', (root_file_id,))
+                image_info = lib_file_query.fetchone()
+                folder_id = image_info['folder']
+                base_name = image_info['baseName']
+                image_path = folders[folder_id] + base_name
+                tmp_image_path = image_path
+                idx = 0
+                while tmp_image_path in collections[collection_id]['images']:
+                    idx += 1
+                    tmp_image_path = image_path + '-' + str(idx)
+                image_path = tmp_image_path
+                collections[collection_id]['images'].append(image_path)
         collections[collection_id]['count'] = len(collections[collection_id]['images'])
 
     return collections
